@@ -17,8 +17,9 @@ const currCenturyHalf = '20';
 const yearCheck = 30;
 
 function formatDate(date, fromFormat, toFormat) {
-  const dateObj = makeDateObject(date, fromFormat);
-  const separator = toFormat.slice(-1);
+  const separator = getSeparator(fromFormat);
+  const dateObj = makeDateObject(date, fromFormat, separator);
+  const newSeparator = getSeparator(toFormat);
   const newDate = [];
 
   for (let i = 0; i < 3; i++) {
@@ -34,11 +35,15 @@ function formatDate(date, fromFormat, toFormat) {
     newDate.push(newPart);
   }
 
-  return newDate.join(separator);
+  return newDate.join(newSeparator);
 }
 
-function makeDateObject(date, format) {
-  const separator = format.slice(-1);
+function getSeparator(format) {
+  // Формат має вигляд ['YYYY', 'MM', 'DD', '-']
+  return format.find((el) => ![yearLong, yearShort, month, day].includes(el));
+}
+
+function makeDateObject(date, format, separator) {
   const dateParts = date.split(separator);
   const dateObj = {};
 
@@ -61,7 +66,9 @@ function normalizeYear(year, formatYear) {
   if (lengthDiff === 0) {
     return year;
   } else if (lengthDiff < 0) {
-    return (year < yearCheck ? currCenturyHalf : prevCenturyHalf) + year;
+    return (
+      (parseInt(year) < yearCheck ? currCenturyHalf : prevCenturyHalf) + year
+    );
   } else {
     return year.slice(-2);
   }
